@@ -125,12 +125,17 @@ Choose the deployment strategy that fits your needs:
 
 | Feature | Version 1 | Version 1.5 | Version 2 |
 |---------|-----------|-------------|-----------|
-| **PR Preview Deployments** | ✅ Yes | ✅ Yes | ❌ No |
-| **Staging Environments** | ✅ Yes | ✅ Yes | ❌ No |
+| **PR Preview Deployments** | ✅ Yes (single) | ✅ Yes (single) | ❌ No |
+| **PR Preview (Monorepo)** | ⚠️ Not implemented | ⚠️ Not implemented | ❌ No |
+| **Staging Environments** | ✅ Yes (single) | ✅ Yes (single) | ❌ No |
+| **Staging (Monorepo)** | ⚠️ Not implemented | ⚠️ Not implemented | ❌ No |
 | **Wildcard SSL Support** | ✅ Yes | ✅ Yes | ❌ No |
-| **Monorepo Support** | ✅ Yes | ✅ Yes | ⚠️ Limited |
+| **Monorepo Support** | ✅ Yes | ✅ Yes | ❌ No |
+| **Git Pull Monorepo** | ❌ N/A | ❌ N/A | ❌ Not implemented |
 
-**Winner:** Version 1 & 1.5 (most features)
+**Winner:** Version 1 & 1.5 (most features, but monorepo preview/staging missing)
+
+**⚠️ Note:** PR preview and staging support for monorepos is planned but not yet implemented. See [TODO.md](TODO.md) for details.
 
 ## 🏰 Monorepo Support
 
@@ -197,6 +202,8 @@ Version 1 & 1.5 additionally support:
 
 - [ ] Single app deployment tested
 - [ ] Monorepo deployment tested
+- [ ] PR preview deployment tested (⚠️ Not implemented)
+- [ ] Staging deployment tested (⚠️ Not implemented)
 - [ ] Build failure recovery tested
 - [ ] Swap space handling verified
 - [ ] Large repo performance tested
@@ -205,7 +212,57 @@ Version 1 & 1.5 additionally support:
 - [ ] Multi-region deployment tested
 - [ ] Load testing performed
 
+### Monorepo Versions
+
+#### Version 1 Monorepo
+- [ ] Multi-app deployment tested
+- [ ] Path-based filtering verified
+- [ ] PR preview deployment tested (⚠️ Not implemented)
+- [ ] Staging deployment tested (⚠️ Not implemented)
+- [ ] Independent app deployments verified
+- [ ] Port isolation tested
+
+#### Version 1.5 Monorepo
+- [ ] Multi-app deployment tested
+- [ ] Path-based filtering verified
+- [ ] PR preview deployment tested (⚠️ Not implemented)
+- [ ] Staging deployment tested (⚠️ Not implemented)
+- [ ] Independent app deployments verified
+- [ ] Atomic rollback per app tested
+- [ ] Port isolation tested
+
 ## 🗺️ Roadmap
+
+### ⚠️ Missing Features (High Priority)
+
+These features are currently missing and should be prioritized:
+
+#### PR Preview & Staging Support
+- [ ] **PR Preview for Monorepos**
+  - [ ] Version 1 monorepo PR preview workflows
+  - [ ] Version 1.5 monorepo PR preview workflows
+  - [ ] Per-app preview deployments in monorepo
+  - [ ] Preview cleanup automation
+
+- [ ] **Staging for Monorepos**
+  - [ ] Version 1 monorepo staging workflows
+  - [ ] Version 1.5 monorepo staging workflows
+  - [ ] Per-app staging environments
+
+- [ ] **Version 2 (Git Pull) Missing Features**
+  - [ ] PR preview deployment support
+  - [ ] Staging deployment support
+  - [ ] Wildcard SSL certificate setup
+  - [ ] Dynamic Nginx routing for previews
+
+- [ ] **Git Pull Monorepo Support**
+  - [ ] Complete monorepo setup script for Git Pull
+  - [ ] Path-based filtering for Git Pull
+  - [ ] Multiple apps on one server (Git Pull)
+  - [ ] PR preview for Git Pull monorepo
+  - [ ] Staging for Git Pull monorepo
+
+📋 See [TODO.md](TODO.md) for detailed tracking of all missing features and implementation details.
 
 ### Planned Features
 
@@ -252,6 +309,38 @@ Version 1 & 1.5 additionally support:
   - [ ] Disaster recovery procedures
 
 #### Advanced CI/CD Features
+
+- [ ] **PR Preview Deployments - Missing Implementations**
+  - [ ] PR preview support for monorepo (Version 1)
+  - [ ] PR preview support for monorepo (Version 1.5)
+  - [ ] PR preview support for Version 2 (Git Pull)
+  - [ ] PR preview cleanup automation (remove old previews)
+  - [ ] PR preview comment updates with deployment status
+  - [ ] Preview deployment health checks
+
+- [ ] **Staging Deployments - Missing Implementations**
+  - [ ] Staging support for monorepo (Version 1)
+  - [ ] Staging support for monorepo (Version 1.5)
+  - [ ] Staging support for Version 2 (Git Pull)
+  - [ ] Staging environment management
+  - [ ] Staging to production promotion workflow
+
+- [ ] **Version 2 (Git Pull) Enhancements**
+  - [ ] PR preview deployments for Git Pull strategy
+  - [ ] Staging deployments for Git Pull strategy
+  - [ ] Wildcard SSL support for Git Pull strategy
+  - [ ] Monorepo support for Git Pull strategy
+  - [ ] Path-based filtering for monorepo Git Pull
+  - [ ] Multiple apps on one server (Git Pull)
+
+- [ ] **Monorepo Enhancements**
+  - [ ] PR preview deployments (Version 1 monorepo)
+  - [ ] PR preview deployments (Version 1.5 monorepo)
+  - [ ] Staging deployments (Version 1 monorepo)
+  - [ ] Staging deployments (Version 1.5 monorepo)
+  - [ ] Cross-app dependency handling
+  - [ ] Shared package deployment strategies
+
 - [ ] **Multi-Environment Support**
   - [ ] Development environment setup
   - [ ] QA environment automation
