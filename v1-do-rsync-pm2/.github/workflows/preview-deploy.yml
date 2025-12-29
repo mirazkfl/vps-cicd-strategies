@@ -1,0 +1,217 @@
+name: Preview Deployment
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+concurrency:
+  group: ${{ github.repository }}-pr-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  preview-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Determine Preview Port and URL
+        id: preview-configs
+        run: |
+          PR_NUMBER=${{ github.event.pull_request.number }}
+          PORT_RANGE=499
+          PORT=$((8500 + (PR_NUMBER % PORT_RANGE)))
+          PREVIEW_URL="https://preview-${PORT}.${{ secrets.DOMAIN_NAME }}"
+          PM2_NAME="preview-${PR_NUMBER}"
+
+          echo "port=$PORT" >> $GITHUB_OUTPUT
+          echo "preview_url=$PREVIEW_URL" >> $GITHUB_OUTPUT
+          echo "pm2_name=$PM2_NAME" >> $GITHUB_OUTPUT
+
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build project
+        id: build
+        run: |
+          if ! npm run build; then
+            echo "build-status=0" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+          echo "build-status=1" >> $GITHUB_OUTPUT
+        env:
+          NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
+
+      - name: Update build status comment
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const prNumber = context.issue.number;
+            const buildStatus = '${{ steps.build.outputs.build-status }}';
+            const logsUrl = `${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}`;
+
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+              per_page: 100
+            });
+
+            const previewComment = comments.find(comment => 
+              comment.body.includes('## Preview Deployment Status')
+            );
+
+            const statusEmoji = buildStatus === '1' ? '✅' : '❌';
+            const statusText = buildStatus === '1' ? 'Build Successful' : 'Build Failed';
+
+            const commentBody = `## Preview Deployment Status\n\n` +
+              `### Build Status\n` +
+              `${statusEmoji} ${statusText}\n\n` +
+              `### Preview URL\n` +
+              `🔄 Building...\n\n` +
+              `### Logs\n` +
+              `[View Build Logs](${logsUrl})`;
+
+            if (previewComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: previewComment.id,
+                body: commentBody
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                body: commentBody
+              });
+            }
+
+      - name: Prepare deployment files
+        if: ${{ steps.build.outputs.build-status == 1 }}
+        run: |
+          mkdir -p deploy_package
+          cp -r .next/standalone/. deploy_package/
+          cp -r .next/static deploy_package/.next/static
+          cp -r public deploy_package/public
+          cp ecosystem.config.js deploy_package/
+
+      - name: Set up SSH Agent
+        if: ${{ steps.build.outputs.build-status == 1 }}
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Upload using rsync
+        if: ${{ steps.build.outputs.build-status == 1 }}
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H ${{ secrets.DROPLET_IP }} >> ~/.ssh/known_hosts
+          
+          PR_NUMBER=${{ github.event.pull_request.number }}
+          REMOTE_PATH="/home/${{ secrets.DROPLET_USER }}/app/preview/$PR_NUMBER"
+          
+          # Ensure the target directory exists
+          ssh ${{ secrets.DROPLET_USER }}@${{ secrets.DROPLET_IP }} "mkdir -p $REMOTE_PATH"
+          
+          rsync -avz --delete ./deploy_package/ ${{ secrets.DROPLET_USER }}@${{ secrets.DROPLET_IP }}:$REMOTE_PATH/
+
+      - name: Deploy on Server
+        if: ${{ steps.build.outputs.build-status == 1 }}
+        id: deploy
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.DROPLET_IP }}
+          username: ${{ secrets.DROPLET_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+            
+            PR_NUMBER="${{ github.event.pull_request.number }}"
+            APP_PATH="/home/${{ secrets.DROPLET_USER }}/app/preview/${PR_NUMBER}"
+            PM2_NAME="${{ steps.preview-configs.outputs.pm2_name }}"
+            PORT="${{ steps.preview-configs.outputs.port }}"
+            
+            cd "$APP_PATH"
+            
+            # Set environment variables for PM2
+            export PORT=$PORT
+            export NEXT_PUBLIC_APP_BASE_URL="${{ steps.preview-configs.outputs.preview_url }}"
+            
+            if pm2 list | grep -q "$PM2_NAME"; then
+              # Restart with updated environment variables
+              PORT=$PORT NEXT_PUBLIC_APP_BASE_URL="${{ steps.preview-configs.outputs.preview_url }}" pm2 restart "$PM2_NAME" --update-env
+            else
+              # Start with PORT from environment (overrides ecosystem.config.js default)
+              PORT=$PORT NEXT_PUBLIC_APP_BASE_URL="${{ steps.preview-configs.outputs.preview_url }}" pm2 start ecosystem.config.js --name "$PM2_NAME" --update-env
+            fi
+            
+            pm2 save
+
+      - name: Update deployment status comment
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const prNumber = context.issue.number;
+            const buildStatus = '${{ steps.build.outputs.build-status }}';
+            const deployStatus = '${{ steps.deploy.outcome }}';
+            const logsUrl = `${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}`;
+            const previewUrl = '${{ steps.preview-configs.outputs.preview_url }}';
+
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+              per_page: 100
+            });
+
+            const previewComment = comments.find(comment => 
+              comment.body.includes('## Preview Deployment Status')
+            );
+
+            const buildEmoji = buildStatus === '1' ? '✅' : '❌';
+            const buildText = buildStatus === '1' ? 'Build Successful' : 'Build Failed';
+            const deployEmoji = deployStatus === 'success' ? '🚀' : '❌';
+            const deployText = deployStatus === 'success' ? 'Preview Deployed!' : 'Preview Failed!';
+
+            const commentBody = `## Preview Deployment Status\n\n` +
+              `| Status | Result |\n` +
+              `|--------|--------|\n` +
+              `| Build | ${buildEmoji} ${buildText} |\n` +
+              `| Deploy | ${deployEmoji} ${deployText} |\n\n` +
+              `### Preview URL\n` +
+              `[View Preview](${previewUrl})\n\n` +
+              `### Logs\n` +
+              `[View Build Logs](${logsUrl})`;
+
+            if (previewComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: previewComment.id,
+                body: commentBody
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                body: commentBody
+              });
+            }
+
