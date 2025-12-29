@@ -1,0 +1,24 @@
+# Global owners
+* @vishwaj33t
+
+# Setup scripts
+*.sh @vishwaj33t
+
+# GitHub Actions workflows
+/.github/workflows/ @vishwaj33t
+
+# Documentation
+*.md @vishwaj33t
+/docs/ @vishwaj33t
+
+# Version 1
+/v1-do-rsync-pm2/ @vishwaj33t
+
+# Version 1.5
+/v1.5-do-rsync-atomic-pm2/ @vishwaj33t
+
+# Version 2
+/v2-do-git-pm2/ @vishwaj33t
+
+# Monorepo versions
+/*-monorepo/ @vishwaj33t
