@@ -1,0 +1,55 @@
+name: Production Deployment (Git Pull)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "apps/web/**"
+      - ".github/workflows/deploy-git.yml"
+
+concurrency:
+  group: ${{ github.repository }}-prod
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Server Update
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.DROPLET_IP }}
+          username: ${{ secrets.DROPLET_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            # Source Node.js environment
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+            
+            # Ensure project directory exists
+            mkdir -p /home/${{ secrets.DROPLET_USER }}/project_repo
+            
+            # Navigate to project
+            cd /home/${{ secrets.DROPLET_USER }}/project_repo
+            
+            # Check if this is a git repository
+            if [ ! -d .git ]; then
+              echo "❌ Error: Repository not cloned. Please run the initial clone first:"
+              echo "   git clone <your-repo-url> /home/${{ secrets.DROPLET_USER }}/project_repo"
+              exit 1
+            fi
+            
+            echo "⬇️ Pulling latest code..."
+            git pull origin main
+            
+            echo "📦 Installing dependencies..."
+            npm ci
+            
+            echo "🏗️ Building application..."
+            # This happens ON the server
+            npm run build
+            
+            echo "🚀 Reloading PM2..."
+            pm2 reload ecosystem.config.js --update-env || pm2 start ecosystem.config.js
+            pm2 save
+            
