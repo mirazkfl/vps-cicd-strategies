@@ -1,0 +1,86 @@
+name: Staging Deployment (Atomic)
+
+on:
+  push:
+    branches:
+      - staging
+      - staging/*
+
+concurrency:
+  group: ${{ github.repository }}-staging
+  cancel-in-progress: true
+
+jobs:
+  staging-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build project
+        id: build
+        run: |
+          if ! npm run build; then
+            echo "build-status=0" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+          echo "build-status=1" >> $GITHUB_OUTPUT
+        env:
+          NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
+
+      - name: Prepare deployment files
+        if: ${{ steps.build.outputs.build-status == 1 }}
+        run: |
+          mkdir -p deploy_package
+          cp -r .next/standalone/. deploy_package/
+          cp -r .next/static deploy_package/.next/static
+          cp -r public deploy_package/public
+          cp ecosystem.config.js deploy_package/
+
+      - name: Set up SSH Agent
+        if: ${{ steps.build.outputs.build-status == 1 }}
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Sync Files to Server (Rsync)
+        if: ${{ steps.build.outputs.build-status == 1 }}
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H ${{ secrets.DROPLET_IP }} >> ~/.ssh/known_hosts
+          
+          # Ensure the target directory exists
+          ssh ${{ secrets.DROPLET_USER }}@${{ secrets.DROPLET_IP }} "mkdir -p /home/${{ secrets.DROPLET_USER }}/app/staging"
+          
+          rsync -avz --delete ./deploy_package/ ${{ secrets.DROPLET_USER }}@${{ secrets.DROPLET_IP }}:/home/${{ secrets.DROPLET_USER }}/app/staging/
+
+      - name: Reload PM2
+        if: ${{ steps.build.outputs.build-status == 1 }}
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.DROPLET_IP }}
+          username: ${{ secrets.DROPLET_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+            
+            # Ensure app directory exists
+            mkdir -p /home/${{ secrets.DROPLET_USER }}/app/staging
+            cd /home/${{ secrets.DROPLET_USER }}/app/staging
+            
+            # Reload PM2 (assumes ecosystem.config.js name is "staging-app" or update accordingly)
+            pm2 reload ecosystem.config.js --update-env || pm2 start ecosystem.config.js --name "staging-app" --update-env
+            
+            # Save the process list so it comes back on reboot
+            pm2 save
+
