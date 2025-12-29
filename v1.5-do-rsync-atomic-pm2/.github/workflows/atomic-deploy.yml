@@ -1,0 +1,73 @@
+name: Atomic Production Deployment
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "apps/web/**"
+      - ".github/workflows/atomic-deploy.yml"
+
+concurrency:
+  group: ${{ github.repository }}-atomic
+  cancel-in-progress: true
+
+jobs:
+  atomic-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build project
+        run: npm run build
+        env:
+          NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
+
+      - name: Create Release Artifacts
+        run: |
+          mkdir -p deploy_package
+          cp -r apps/web/.next/standalone/. deploy_package/
+          cp -r apps/web/.next/static deploy_package/.next/static
+          cp -r apps/web/public deploy_package/public
+          cp ecosystem.config.js deploy_package/
+
+      - name: Set up SSH Agent
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Generate Release ID
+        id: release
+        run: echo "id=$(date +%Y%m%d%H%M%S)" >> $GITHUB_OUTPUT
+
+      - name: Upload and Switch (Atomic)
+        run: |
+          # 1. Define Variables
+          USER=${{ secrets.DROPLET_USER }}
+          HOST=${{ secrets.DROPLET_IP }}
+          RELEASE_ID=${{ steps.release.outputs.id }}
+          REMOTE_DIR="/home/$USER/app/releases/$RELEASE_ID"
+          
+          # 2. Add Host Key
+          mkdir -p ~/.ssh
+          ssh-keyscan -H $HOST >> ~/.ssh/known_hosts
+
+          # 3. Ensure base directories exist and create Release Directory
+          ssh $USER@$HOST "mkdir -p /home/$USER/app/releases /home/$USER/app/scripts && mkdir -p $REMOTE_DIR"
+
+          # 4. Upload Files to the NEW Folder
+          echo "📤 Uploading to new release folder: $RELEASE_ID..."
+          rsync -avz --delete ./deploy_package/ $USER@$HOST:$REMOTE_DIR/
+
+          # 5. Atomic Switch Script
+          # We run a remote script to link 'current' -> 'releases/new_id'
+          ssh $USER@$HOST "bash /home/$USER/app/scripts/atomic_switch.sh $RELEASE_ID"
